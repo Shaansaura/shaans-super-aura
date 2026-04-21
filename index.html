@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shaan OS</title>
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: lime;
+  font-family: monospace;
+}
+
+#terminal {
+  padding: 10px;
+}
+
+input {
+  background: black;
+  color: lime;
+  border: none;
+  outline: none;
+}
+</style>
+</head>
+
+<body>
+<div id="terminal">
+  <div id="output">🔥 Shaan Web OS 🔥<br></div>
+  <input id="input" autofocus />
+</div>
+
+<script>
+let input = document.getElementById("input");
+let output = document.getElementById("output");
+
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    let cmd = input.value;
+    output.innerHTML += ">> " + cmd + "<br>";
+
+    if (cmd === "help") {
+      output.innerHTML += "Commands: help, hello<br>";
+    } else if (cmd === "hello") {
+      output.innerHTML += "Welcome Shaan 😎<br>";
+    } else {
+      output.innerHTML += "Command not found<br>";
+    }
+
+    input.value = "";
+  }
+});
+</script>
+</body>
+</html>
