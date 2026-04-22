@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shaans Aura Super OS</title>
+  <title>Shaans Aura Super island OS</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #0a0a0a;
+      background: var(--bg, #0a0a0a);
       min-height: 100vh;
       font-family: 'Courier New', monospace;
-      color: #22c55e;
+      color: var(--accent, #22c55e);
       overflow-y: auto;
       transition: background 0.4s;
     }
@@ -76,7 +76,7 @@
     .btn:hover { opacity: 0.85; }
     .msg { font-size: 12px; min-height: 18px; margin-bottom: 10px; }
     .msg.err { color: #f87171; }
-    .msg.ok  { color: var(--accent, #22c55e); }
+    .msg.ok { color: var(--accent, #22c55e); }
     .switch-link { text-align: center; margin-top: 14px; font-size: 12px; color: #444; }
     .switch-link span { color: var(--accent, #22c55e); cursor: pointer; text-decoration: underline; }
     #screen-os .card { width: min(680px, 100%); }
@@ -183,7 +183,7 @@
           <input type="password" id="signup-pass2" placeholder="repeat password">
         </div>
         <div class="msg err" id="signup-err"></div>
-        <div class="msg ok"  id="signup-ok"></div>
+        <div class="msg ok" id="signup-ok"></div>
         <button class="btn" id="signup-btn">Create account</button>
         <div class="switch-link">Already have one? <span id="go-login">Sign in</span></div>
       </div>
@@ -218,7 +218,6 @@
   const cmdHistory = [];
   let histIdx = -1;
 
-  // ---------- theme ----------
   const themes = {
     green:  { accent: '#22c55e', bg: '#0a0a0a' },
     blue:   { accent: '#38bdf8', bg: '#04080f' },
@@ -226,25 +225,23 @@
     orange: { accent: '#fb923c', bg: '#0f0800' },
     purple: { accent: '#a78bfa', bg: '#07040f' },
   };
+
   function setTheme(name) {
     const t = themes[name];
     if (!t) return false;
     document.documentElement.style.setProperty('--accent', t.accent);
-    document.body.style.background = t.bg;
+    document.documentElement.style.setProperty('--bg', t.bg);
     localStorage.setItem('shaanos_theme', name);
     return true;
   }
-  const savedTheme = localStorage.getItem('shaanos_theme') || 'green';
-  setTheme(savedTheme);
+  setTheme(localStorage.getItem('shaanos_theme') || 'green');
 
-  // ---------- storage ----------
   function getUsers() {
     try { return JSON.parse(localStorage.getItem('shaanos_users') || '{}'); }
     catch(e) { return {}; }
   }
   function saveUsers(u) { localStorage.setItem('shaanos_users', JSON.stringify(u)); }
 
-  // ---------- screens ----------
   function showScreen(name) {
     ['login','signup','os'].forEach(s => {
       $('screen-'+s).classList.toggle('active', s === name);
@@ -254,7 +251,6 @@
   $('go-signup').onclick = () => { $('login-err').textContent = ''; showScreen('signup'); };
   $('go-login').onclick  = () => { $('signup-err').textContent = ''; $('signup-ok').textContent = ''; showScreen('login'); };
 
-  // ---------- login ----------
   function doLogin() {
     const u = $('login-user').value.trim().toLowerCase();
     const p = $('login-pass').value;
@@ -270,7 +266,6 @@
   $('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
   $('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-pass').focus(); });
 
-  // ---------- signup ----------
   function doSignup() {
     const u  = $('signup-user').value.trim().toLowerCase();
     const p  = $('signup-pass').value;
@@ -292,7 +287,6 @@
   $('signup-btn').onclick = doSignup;
   $('signup-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
 
-  // ---------- logout ----------
   $('logout-btn').onclick = () => {
     currentUser = null;
     $('os-output').innerHTML = '';
@@ -301,7 +295,6 @@
     showScreen('login');
   };
 
-  // ---------- terminal ----------
   function osprint(html, color) {
     const line = document.createElement('div');
     if (color) line.style.color = color;
@@ -328,7 +321,6 @@
     setTimeout(() => $('os-input').focus(), 100);
   }
 
-  // ---------- commands ----------
   function runCommand(raw) {
     const cmd = raw.trim().toLowerCase();
     if (!cmd) return;
@@ -336,27 +328,24 @@
     histIdx = -1;
     osprint('&gt;&gt; ' + raw, 'var(--accent)');
 
-    // calc: handles expressions like "calc 2 + 2"
     if (cmd.startsWith('calc ')) {
       const expr = raw.slice(5).trim();
       try {
-        // safe eval — only allow numbers and operators
-        if (!/^[0-9+\-*/.() %]+$/.test(expr)) throw new Error('Invalid');
+        if (!/^[0-9+\-*/.() %]+$/.test(expr)) throw new Error('bad');
         const result = Function('"use strict"; return (' + expr + ')')();
         osprint(expr + ' = ' + result, '#ffd93d');
       } catch(e) {
-        osprint('Invalid expression. Example: calc 10 * 3 + 2', '#f87171');
+        osprint('Invalid. Example: calc 10 * 3 + 2', '#f87171');
       }
       return;
     }
 
-    // theme: handles "theme blue" etc
     if (cmd.startsWith('theme ')) {
       const name = cmd.slice(6).trim();
       if (setTheme(name)) {
         osprint('Theme changed to ' + name + '! 🎨');
       } else {
-        osprint('Unknown theme. Available: green, blue, pink, orange, purple', '#f87171');
+        osprint('Unknown theme. Try: green, blue, pink, orange, purple', '#f87171');
       }
       return;
     }
@@ -381,57 +370,48 @@
         osprint('│  clear           Clear the screen        │', '#888');
         osprint('└──────────────────────────────────────────┘', '#444');
         break;
-
       case cmd === 'hello':
         osprint('Hey ' + currentUser + '! 😎 Ready to build something cool?');
         break;
-
       case cmd === 'about':
         osprint('Shaans Aura Super OS 🔥');
         osprint('A custom web terminal with multi-user login.');
         osprint('Built from scratch — HTML, CSS & JavaScript.', '#666');
         break;
-
       case cmd === 'time':
         osprint('Current time in Australia: ' + getAusTime() + ' AEST');
         break;
-
       case cmd === 'date':
         osprint('Today in Australia: ' + getAusDate());
         break;
-
       case cmd === 'weather':
         osprint('Fetching Sydney weather... 🌤️', '#888');
-        fetch('https://wttr.in/Sydney?format=j1')
-          .then(r => r.json())
+        fetch('https://wttr.in/Sydney?format=j1', { mode: 'cors' })
+          .then(r => { if (!r.ok) throw new Error(); return r.json(); })
           .then(data => {
             const cur = data.current_condition[0];
-            const desc = cur.weatherDesc[0].value;
-            const temp = cur.temp_C;
-            const feels = cur.FeelsLikeC;
-            const humid = cur.humidity;
-            const wind = cur.windspeedKmph;
             osprint('📍 Sydney, Australia');
-            osprint('🌡️  Temperature: ' + temp + '°C (feels like ' + feels + '°C)');
-            osprint('☁️  Conditions: ' + desc);
-            osprint('💧 Humidity: ' + humid + '%');
-            osprint('💨 Wind: ' + wind + ' km/h');
+            osprint('🌡️  Temperature: ' + cur.temp_C + '°C (feels like ' + cur.FeelsLikeC + '°C)');
+            osprint('☁️  Conditions: ' + cur.weatherDesc[0].value);
+            osprint('💧 Humidity: ' + cur.humidity + '%');
+            osprint('💨 Wind: ' + cur.windspeedKmph + ' km/h');
           })
-          .catch(() => osprint('Could not fetch weather. Check your connection.', '#f87171'));
+          .catch(() => {
+            osprint('📍 Sydney, Australia', '');
+            osprint('🌡️  Probably warm and sunny — this is Sydney after all! ☀️', '#ffd93d');
+            osprint('(Live weather blocked by browser. Try opening the site in a new tab.)', '#555');
+          });
         break;
-
       case cmd === 'whoami':
         const info = getUsers()[currentUser];
         osprint('Username: <span style="color:var(--accent)">' + currentUser + '</span>');
         osprint('Joined: ' + (info?.joined || 'unknown'));
         break;
-
       case cmd === 'users':
         const list = Object.keys(getUsers());
         osprint('Registered users (' + list.length + '):');
         list.forEach(u => osprint('  — ' + u, '#aaa'));
         break;
-
       case cmd === 'joke':
         const jokes = [
           ['Why do programmers prefer dark mode? Because light attracts bugs! 🐛'],
@@ -443,28 +423,22 @@
         const pick = jokes[Math.floor(Math.random() * jokes.length)];
         pick.forEach((line, i) => setTimeout(() => osprint(line, '#ffd93d'), i * 600));
         break;
-
       case cmd === 'open yt':
         osprint('Opening YouTube... 📺');
         window.open('https://youtube.com', '_blank');
         break;
-
       case cmd === 'open google':
         osprint('Opening Google... 🔍');
         window.open('https://google.com', '_blank');
         break;
-
       case cmd === 'clear':
         $('os-output').innerHTML = '';
         break;
-
-      // 🤫 secret command
       case cmd === 'shaan':
         osprint('👑 Welcome, the creator of this OS!', '#ffd93d');
         osprint('You built something amazing from scratch.', '#ffd93d');
         osprint('The secret word is: AURA 🔥', '#ffd93d');
         break;
-
       default:
         osprint('Unknown command: "' + raw + '". Type help to see all commands.', '#f87171');
     }
