@@ -9,20 +9,26 @@
     body {
       background: #0a0a0a;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-family: 'Courier New', monospace;
       color: #22c55e;
+      overflow-y: auto;
     }
     .screen { display: none; width: 100%; }
-    .screen.active { display: flex; justify-content: center; padding: 2rem 1rem; }
+    .screen.active {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem 1rem;
+      min-height: 100vh;
+    }
     .card {
       background: #0f0f0f;
       border: 1px solid #2a2a2a;
       border-radius: 12px;
       overflow: hidden;
       width: 360px;
+      margin-top: auto;
+      margin-bottom: auto;
     }
     .titlebar {
       background: #1a1a1a;
@@ -126,7 +132,6 @@
 </head>
 <body>
 
-  <!-- LOGIN -->
   <div id="screen-login" class="screen active">
     <div class="card">
       <div class="titlebar">
@@ -136,4 +141,246 @@
         <span class="titlebar-title">Shaans Aura Super OS — login</span>
       </div>
       <div class="card-body">
-        <div class="brand">🔥 Shaans Aura Super OS</d
+        <div class="brand">🔥 Shaans Aura Super OS</div>
+        <div class="brand-sub">Sign in to your account</div>
+        <div class="field">
+          <label>username</label>
+          <input type="text" id="login-user" placeholder="your username" autocomplete="username">
+        </div>
+        <div class="field">
+          <label>password</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <div class="msg err" id="login-err"></div>
+        <button class="btn" id="login-btn">Sign in</button>
+        <div class="switch-link">No account? <span id="go-signup">Sign up</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-signup" class="screen">
+    <div class="card">
+      <div class="titlebar">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+        <span class="titlebar-title">Shaans Aura Super OS — sign up</span>
+      </div>
+      <div class="card-body">
+        <div class="brand">Create account</div>
+        <div class="brand-sub">Join Shaans Aura Super OS</div>
+        <div class="field">
+          <label>username</label>
+          <input type="text" id="signup-user" placeholder="choose a username">
+        </div>
+        <div class="field">
+          <label>password</label>
+          <input type="password" id="signup-pass" placeholder="at least 4 characters">
+        </div>
+        <div class="field">
+          <label>confirm password</label>
+          <input type="password" id="signup-pass2" placeholder="repeat password">
+        </div>
+        <div class="msg err" id="signup-err"></div>
+        <div class="msg ok"  id="signup-ok"></div>
+        <button class="btn" id="signup-btn">Create account</button>
+        <div class="switch-link">Already have one? <span id="go-login">Sign in</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-os" class="screen">
+    <div class="card">
+      <div class="os-titlebar">
+        <div class="os-titlebar-left">
+          <div class="dot" style="background:#ff5f57"></div>
+          <div class="dot" style="background:#febc2e"></div>
+          <div class="dot" style="background:#28c840"></div>
+          <span style="margin-left:8px;font-size:12px;color:#555;">Shaans Aura Super OS</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span id="os-username-badge"></span>
+          <button class="btn-ghost" id="logout-btn">logout</button>
+        </div>
+      </div>
+      <div id="os-output"></div>
+      <div class="os-inputbar">
+        <span class="os-prompt">&gt;&gt;</span>
+        <input type="text" id="os-input" placeholder="type a command..." autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+  </div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let currentUser = null;
+  const cmdHistory = [];
+  let histIdx = -1;
+
+  function getUsers() {
+    try { return JSON.parse(localStorage.getItem('shaanos_users') || '{}'); }
+    catch(e) { return {}; }
+  }
+  function saveUsers(u) { localStorage.setItem('shaanos_users', JSON.stringify(u)); }
+
+  function showScreen(name) {
+    ['login','signup','os'].forEach(s => {
+      $('screen-'+s).classList.toggle('active', s === name);
+    });
+  }
+
+  $('go-signup').onclick = () => { $('login-err').textContent = ''; showScreen('signup'); };
+  $('go-login').onclick  = () => { $('signup-err').textContent = ''; $('signup-ok').textContent = ''; showScreen('login'); };
+
+  function doLogin() {
+    const u = $('login-user').value.trim().toLowerCase();
+    const p = $('login-pass').value;
+    if (!u || !p) { $('login-err').textContent = 'Please fill in both fields.'; return; }
+    const users = getUsers();
+    if (!users[u] || users[u].password !== p) { $('login-err').textContent = 'Wrong username or password.'; return; }
+    $('login-err').textContent = '';
+    $('login-pass').value = '';
+    currentUser = u;
+    bootOS(u);
+  }
+  $('login-btn').onclick = doLogin;
+  $('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  $('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-pass').focus(); });
+
+  function doSignup() {
+    const u  = $('signup-user').value.trim().toLowerCase();
+    const p  = $('signup-pass').value;
+    const p2 = $('signup-pass2').value;
+    $('signup-err').textContent = '';
+    $('signup-ok').textContent  = '';
+    if (!u || !p || !p2)  { $('signup-err').textContent = 'All fields are required.'; return; }
+    if (u.length < 2)     { $('signup-err').textContent = 'Username must be at least 2 characters.'; return; }
+    if (p.length < 4)     { $('signup-err').textContent = 'Password must be at least 4 characters.'; return; }
+    if (p !== p2)         { $('signup-err').textContent = 'Passwords do not match.'; return; }
+    const users = getUsers();
+    if (users[u])         { $('signup-err').textContent = 'Username already taken.'; return; }
+    users[u] = { password: p, joined: new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Sydney' }) };
+    saveUsers(users);
+    $('signup-ok').textContent = 'Account created! Signing you in...';
+    currentUser = u;
+    setTimeout(() => bootOS(u), 900);
+  }
+  $('signup-btn').onclick = doSignup;
+  $('signup-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
+
+  $('logout-btn').onclick = () => {
+    currentUser = null;
+    $('os-output').innerHTML = '';
+    $('login-user').value = '';
+    $('login-pass').value = '';
+    showScreen('login');
+  };
+
+  function osprint(html, color) {
+    const line = document.createElement('div');
+    if (color) line.style.color = color;
+    line.innerHTML = html;
+    $('os-output').appendChild(line);
+    $('os-output').scrollTop = $('os-output').scrollHeight;
+  }
+
+  function getAusTime() {
+    return new Date().toLocaleTimeString('en-AU', { timeZone: 'Australia/Sydney', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  function getAusDate() {
+    return new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Sydney', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function bootOS(username) {
+    $('os-output').innerHTML = '';
+    $('os-username-badge').textContent = username;
+    showScreen('os');
+    const info = getUsers()[username];
+    osprint('🔥 Shaans Aura Super OS 🔥');
+    osprint('Welcome back, <span style="color:#88cfff">' + username + '</span>! Joined: ' + (info?.joined || ''));
+    osprint('Type <span style="color:#88cfff">help</span> to see all commands.');
+    setTimeout(() => $('os-input').focus(), 100);
+  }
+
+  function runCommand(raw) {
+    const cmd = raw.trim().toLowerCase();
+    if (!cmd) return;
+    cmdHistory.unshift(raw);
+    histIdx = -1;
+    osprint('&gt;&gt; ' + raw, '#88cfff');
+    switch(true) {
+      case cmd === 'help':
+        osprint('┌────────────────────────────────────────┐', '#444');
+        osprint('│  Available commands                    │', '#444');
+        osprint('├────────────────────────────────────────┤', '#444');
+        osprint('│  hello        Friendly greeting        │', '#888');
+        osprint('│  about        About this OS            │', '#888');
+        osprint('│  time         Current time (AUS)       │', '#888');
+        osprint('│  date         Current date (AUS)       │', '#888');
+        osprint('│  whoami       Your account info        │', '#888');
+        osprint('│  users        List all users           │', '#888');
+        osprint('│  joke         Random dev joke          │', '#888');
+        osprint('│  open yt      Open YouTube             │', '#888');
+        osprint('│  open google  Open Google              │', '#888');
+        osprint('│  clear        Clear the screen         │', '#888');
+        osprint('└────────────────────────────────────────┘', '#444');
+        break;
+      case cmd === 'hello':
+        osprint('Hey ' + currentUser + '! 😎 Ready to build something cool?');
+        break;
+      case cmd === 'about':
+        osprint('Shaans Aura Super OS 🔥');
+        osprint('A custom web terminal with multi-user login.');
+        osprint('Built from scratch — HTML, CSS & JavaScript.', '#666');
+        break;
+      case cmd === 'time':
+        osprint('Current time in Australia: ' + getAusTime() + ' AEST');
+        break;
+      case cmd === 'date':
+        osprint('Today in Australia: ' + getAusDate());
+        break;
+      case cmd === 'whoami':
+        const info = getUsers()[currentUser];
+        osprint('Username: <span style="color:#88cfff">' + currentUser + '</span>');
+        osprint('Joined: ' + (info?.joined || 'unknown'));
+        break;
+      case cmd === 'users':
+        const list = Object.keys(getUsers());
+        osprint('Registered users (' + list.length + '):');
+        list.forEach(u => osprint('  — ' + u, '#aaa'));
+        break;
+      case cmd === 'joke':
+        const jokes = [
+          ['Why do programmers prefer dark mode? Because light attracts bugs! 🐛'],
+          ['Why did the developer go broke? He used up all his cache. 💸'],
+          ['A SQL query walks into a bar: "Can I join you?" 😄'],
+          ['Why do Java devs wear glasses? Because they dont C#. 👓'],
+          ['Knock knock!', 'Who\'s there?', 'Java.', 'Java who?', 'Java lot of bugs to fix! 🐛']
+        ];
+        const pick = jokes[Math.floor(Math.random() * jokes.length)];
+        pick.forEach((line, i) => setTimeout(() => osprint(line, '#ffd93d'), i * 600));
+        break;
+      case cmd === 'open yt':
+        osprint('Opening YouTube... 📺');
+        window.open('https://youtube.com', '_blank');
+        break;
+      case cmd === 'open google':
+        osprint('Opening Google... 🔍');
+        window.open('https://google.com', '_blank');
+        break;
+      case cmd === 'clear':
+        $('os-output').innerHTML = '';
+        break;
+      default:
+        osprint('Unknown command: "' + raw + '". Type help to see all commands.', '#f87171');
+    }
+  }
+
+  $('os-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { runCommand(this.value); this.value = ''; }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (histIdx < cmdHistory.length - 1) { histIdx++; this.value = cmdHistory[histIdx]; } }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); if (histIdx > 0) { histIdx--; this.value = cmdHistory[histIdx]; } else { histIdx = -1; this.value = ''; } }
+  });
+</script>
+</body>
+</html>
