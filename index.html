@@ -6,6 +6,7 @@
   <title>Shaans Aura Super OS</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       background: var(--bg, #0a0a0a);
       min-height: 100vh;
@@ -14,7 +15,18 @@
       overflow-y: auto;
       transition: background 0.4s;
     }
-    .screen { display: none; width: 100%; }
+
+    /* ── matrix canvas ── */
+    #matrix {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.13;
+      pointer-events: none;
+    }
+
+    .screen { display: none; width: 100%; position: relative; z-index: 1; }
     .screen.active {
       display: flex;
       justify-content: center;
@@ -22,15 +34,99 @@
       padding: 2rem 1rem;
       min-height: 100vh;
     }
+
+    /* ── boot screen ── */
+    #screen-boot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      z-index: 100;
+      background: #0a0a0a;
+    }
+    #boot-text {
+      font-size: 15px;
+      color: #22c55e;
+      white-space: pre;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .glitch {
+      font-size: 28px;
+      font-weight: bold;
+      color: #22c55e;
+      margin-bottom: 24px;
+      position: relative;
+      animation: glitch 1.5s infinite;
+    }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+    }
+    .glitch::before {
+      color: #ff00ff;
+      animation: glitch-top 1.5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    }
+    .glitch::after {
+      color: #00ffff;
+      animation: glitch-bot 1.5s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    }
+    @keyframes glitch {
+      0%,94%,100% { transform: none; }
+      95% { transform: skewX(-3deg); }
+      97% { transform: skewX(3deg); }
+    }
+    @keyframes glitch-top {
+      0%,94%,100% { transform: none; opacity: 0; }
+      95% { transform: translate(-3px, -2px); opacity: 0.8; }
+      97% { transform: translate(3px, 2px); opacity: 0.8; }
+    }
+    @keyframes glitch-bot {
+      0%,94%,100% { transform: none; opacity: 0; }
+      95% { transform: translate(3px, 2px); opacity: 0.8; }
+      97% { transform: translate(-3px, -2px); opacity: 0.8; }
+    }
+    #boot-bar-wrap {
+      width: 260px;
+      height: 4px;
+      background: #1a1a1a;
+      border-radius: 4px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+    #boot-bar {
+      height: 100%;
+      width: 0%;
+      background: #22c55e;
+      border-radius: 4px;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    /* ── card ── */
     .card {
-      background: #0f0f0f;
+      background: rgba(15,15,15,0.92);
       border: 1px solid #2a2a2a;
       border-radius: 12px;
       overflow: hidden;
       width: 360px;
       margin-top: auto;
       margin-bottom: auto;
+      animation: fadeUp 0.5s ease both;
+      backdrop-filter: blur(6px);
     }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
     .titlebar {
       background: #1a1a1a;
       padding: 10px 16px;
@@ -46,6 +142,7 @@
     .brand-sub { font-size: 12px; color: #444; margin-bottom: 24px; }
     label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
     .field { margin-bottom: 14px; }
+
     input[type="text"], input[type="password"] {
       width: 100%;
       background: #1a1a1a;
@@ -56,10 +153,14 @@
       font-size: 13px;
       padding: 9px 12px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    input:focus { border-color: var(--accent, #22c55e); }
+    input:focus {
+      border-color: var(--accent, #22c55e);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #22c55e) 20%, transparent);
+    }
     input::placeholder { color: #444; }
+
     .btn {
       width: 100%;
       background: var(--accent, #22c55e);
@@ -71,14 +172,18 @@
       font-weight: bold;
       font-family: 'Courier New', monospace;
       cursor: pointer;
-      transition: opacity 0.15s;
+      transition: opacity 0.15s, transform 0.1s;
     }
-    .btn:hover { opacity: 0.85; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
     .msg { font-size: 12px; min-height: 18px; margin-bottom: 10px; }
     .msg.err { color: #f87171; }
-    .msg.ok { color: var(--accent, #22c55e); }
+    .msg.ok  { color: var(--accent, #22c55e); }
     .switch-link { text-align: center; margin-top: 14px; font-size: 12px; color: #444; }
     .switch-link span { color: var(--accent, #22c55e); cursor: pointer; text-decoration: underline; }
+
+    /* ── OS terminal ── */
     #screen-os .card { width: min(680px, 100%); }
     .os-titlebar {
       background: #1a1a1a;
@@ -99,8 +204,10 @@
       font-size: 11px;
       font-family: 'Courier New', monospace;
       cursor: pointer;
+      transition: opacity 0.15s;
     }
     .btn-ghost:hover { opacity: 0.75; }
+
     #os-output {
       padding: 16px;
       min-height: 320px;
@@ -110,6 +217,14 @@
       line-height: 1.8;
       color: var(--accent, #22c55e);
     }
+    #os-output div {
+      animation: lineIn 0.15s ease both;
+    }
+    @keyframes lineIn {
+      from { opacity: 0; transform: translateX(-6px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
     .os-inputbar {
       display: flex;
       align-items: center;
@@ -129,88 +244,117 @@
       caret-color: var(--accent, #22c55e);
     }
     #os-input::placeholder { color: #333; }
+
+    /* ── scanline overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.08) 3px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
 
-  <div id="screen-login" class="screen active">
-    <div class="card">
-      <div class="titlebar">
+<canvas id="matrix"></canvas>
+
+<!-- BOOT SCREEN -->
+<div id="screen-boot">
+  <div class="glitch" data-text="🔥 SHAANS AURA SUPER OS">🔥 SHAANS AURA SUPER OS</div>
+  <div id="boot-text"></div>
+  <div id="boot-bar-wrap"><div id="boot-bar"></div></div>
+</div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen">
+  <div class="card">
+    <div class="titlebar">
+      <div class="dot" style="background:#ff5f57"></div>
+      <div class="dot" style="background:#febc2e"></div>
+      <div class="dot" style="background:#28c840"></div>
+      <span class="titlebar-title">Shaans Aura Super OS — login</span>
+    </div>
+    <div class="card-body">
+      <div class="brand">🔥 Shaans Aura Super OS</div>
+      <div class="brand-sub">Sign in to your account</div>
+      <div class="field">
+        <label>username</label>
+        <input type="text" id="login-user" placeholder="your username" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="msg err" id="login-err"></div>
+      <button class="btn" id="login-btn">Sign in</button>
+      <div class="switch-link">No account? <span id="go-signup">Sign up</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div id="screen-signup" class="screen">
+  <div class="card">
+    <div class="titlebar">
+      <div class="dot" style="background:#ff5f57"></div>
+      <div class="dot" style="background:#febc2e"></div>
+      <div class="dot" style="background:#28c840"></div>
+      <span class="titlebar-title">Shaans Aura Super OS — sign up</span>
+    </div>
+    <div class="card-body">
+      <div class="brand">Create account</div>
+      <div class="brand-sub">Join Shaans Aura Super OS</div>
+      <div class="field">
+        <label>username</label>
+        <input type="text" id="signup-user" placeholder="choose a username">
+      </div>
+      <div class="field">
+        <label>password</label>
+        <input type="password" id="signup-pass" placeholder="at least 4 characters">
+      </div>
+      <div class="field">
+        <label>confirm password</label>
+        <input type="password" id="signup-pass2" placeholder="repeat password">
+      </div>
+      <div class="msg err" id="signup-err"></div>
+      <div class="msg ok" id="signup-ok"></div>
+      <button class="btn" id="signup-btn">Create account</button>
+      <div class="switch-link">Already have one? <span id="go-login">Sign in</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- OS -->
+<div id="screen-os" class="screen">
+  <div class="card">
+    <div class="os-titlebar">
+      <div class="os-titlebar-left">
         <div class="dot" style="background:#ff5f57"></div>
         <div class="dot" style="background:#febc2e"></div>
         <div class="dot" style="background:#28c840"></div>
-        <span class="titlebar-title">Shaans Aura Super OS — login</span>
+        <span style="margin-left:8px;font-size:12px;color:#555;">Shaans Aura Super OS</span>
       </div>
-      <div class="card-body">
-        <div class="brand">🔥 Shaans Aura Super OS</div>
-        <div class="brand-sub">Sign in to your account</div>
-        <div class="field">
-          <label>username</label>
-          <input type="text" id="login-user" placeholder="your username" autocomplete="username">
-        </div>
-        <div class="field">
-          <label>password</label>
-          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <div class="msg err" id="login-err"></div>
-        <button class="btn" id="login-btn">Sign in</button>
-        <div class="switch-link">No account? <span id="go-signup">Sign up</span></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="os-username-badge"></span>
+        <button class="btn-ghost" id="logout-btn">logout</button>
       </div>
     </div>
-  </div>
-
-  <div id="screen-signup" class="screen">
-    <div class="card">
-      <div class="titlebar">
-        <div class="dot" style="background:#ff5f57"></div>
-        <div class="dot" style="background:#febc2e"></div>
-        <div class="dot" style="background:#28c840"></div>
-        <span class="titlebar-title">Shaans Aura Super OS — sign up</span>
-      </div>
-      <div class="card-body">
-        <div class="brand">Create account</div>
-        <div class="brand-sub">Join Shaans Aura Super OS</div>
-        <div class="field">
-          <label>username</label>
-          <input type="text" id="signup-user" placeholder="choose a username">
-        </div>
-        <div class="field">
-          <label>password</label>
-          <input type="password" id="signup-pass" placeholder="at least 4 characters">
-        </div>
-        <div class="field">
-          <label>confirm password</label>
-          <input type="password" id="signup-pass2" placeholder="repeat password">
-        </div>
-        <div class="msg err" id="signup-err"></div>
-        <div class="msg ok" id="signup-ok"></div>
-        <button class="btn" id="signup-btn">Create account</button>
-        <div class="switch-link">Already have one? <span id="go-login">Sign in</span></div>
-      </div>
+    <div id="os-output"></div>
+    <div class="os-inputbar">
+      <span class="os-prompt">&gt;&gt;</span>
+      <input type="text" id="os-input" placeholder="type a command..." autocomplete="off" spellcheck="false">
     </div>
   </div>
-
-  <div id="screen-os" class="screen">
-    <div class="card">
-      <div class="os-titlebar">
-        <div class="os-titlebar-left">
-          <div class="dot" style="background:#ff5f57"></div>
-          <div class="dot" style="background:#febc2e"></div>
-          <div class="dot" style="background:#28c840"></div>
-          <span style="margin-left:8px;font-size:12px;color:#555;">Shaans Aura Super OS</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span id="os-username-badge"></span>
-          <button class="btn-ghost" id="logout-btn">logout</button>
-        </div>
-      </div>
-      <div id="os-output"></div>
-      <div class="os-inputbar">
-        <span class="os-prompt">&gt;&gt;</span>
-        <input type="text" id="os-input" placeholder="type a command..." autocomplete="off" spellcheck="false">
-      </div>
-    </div>
-  </div>
+</div>
 
 <script>
   const $ = id => document.getElementById(id);
@@ -218,6 +362,29 @@
   const cmdHistory = [];
   let histIdx = -1;
 
+  // ── matrix rain ──
+  const canvas = $('matrix');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+  const cols = Math.floor(canvas.width / 16);
+  const drops = Array(cols).fill(1);
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(10,10,10,0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#22c55e';
+    ctx.font = '14px Courier New';
+    drops.forEach((y, i) => {
+      const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+      ctx.fillText(char, i * 16, y * 16);
+      if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    });
+  }
+  setInterval(drawMatrix, 50);
+
+  // ── themes ──
   const themes = {
     green:  { accent: '#22c55e', bg: '#0a0a0a' },
     blue:   { accent: '#38bdf8', bg: '#04080f' },
@@ -225,23 +392,68 @@
     orange: { accent: '#fb923c', bg: '#0f0800' },
     purple: { accent: '#a78bfa', bg: '#07040f' },
   };
-
   function setTheme(name) {
     const t = themes[name];
     if (!t) return false;
     document.documentElement.style.setProperty('--accent', t.accent);
     document.documentElement.style.setProperty('--bg', t.bg);
+    document.body.style.background = t.bg;
     localStorage.setItem('shaanos_theme', name);
     return true;
   }
   setTheme(localStorage.getItem('shaanos_theme') || 'green');
 
+  // ── boot sequence ──
+  const bootLines = [
+    'Initializing Shaans Aura Super OS...',
+    'Loading kernel modules... OK',
+    'Mounting file system... OK',
+    'Starting user services... OK',
+    'Applying aura... ✓',
+    'System ready.',
+  ];
+  let bootLine = 0;
+  let bootChar = 0;
+  let bootProgress = 0;
+  const bootEl = $('boot-text');
+  const bootBar = $('boot-bar');
+
+  function typeBoot() {
+    if (bootLine >= bootLines.length) {
+      setTimeout(() => {
+        $('screen-boot').style.transition = 'opacity 0.6s';
+        $('screen-boot').style.opacity = '0';
+        setTimeout(() => {
+          $('screen-boot').style.display = 'none';
+          showScreen('login');
+        }, 600);
+      }, 400);
+      return;
+    }
+    const line = bootLines[bootLine];
+    if (bootChar < line.length) {
+      bootEl.textContent += line[bootChar];
+      bootChar++;
+      setTimeout(typeBoot, 18);
+    } else {
+      bootEl.textContent += '\n';
+      bootLine++;
+      bootChar = 0;
+      bootProgress = Math.round((bootLine / bootLines.length) * 100);
+      bootBar.style.width = bootProgress + '%';
+      setTimeout(typeBoot, 120);
+    }
+  }
+  setTimeout(typeBoot, 400);
+
+  // ── storage ──
   function getUsers() {
     try { return JSON.parse(localStorage.getItem('shaanos_users') || '{}'); }
     catch(e) { return {}; }
   }
   function saveUsers(u) { localStorage.setItem('shaanos_users', JSON.stringify(u)); }
 
+  // ── screens ──
   function showScreen(name) {
     ['login','signup','os'].forEach(s => {
       $('screen-'+s).classList.toggle('active', s === name);
@@ -251,6 +463,7 @@
   $('go-signup').onclick = () => { $('login-err').textContent = ''; showScreen('signup'); };
   $('go-login').onclick  = () => { $('signup-err').textContent = ''; $('signup-ok').textContent = ''; showScreen('login'); };
 
+  // ── login ──
   function doLogin() {
     const u = $('login-user').value.trim().toLowerCase();
     const p = $('login-pass').value;
@@ -266,6 +479,7 @@
   $('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
   $('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-pass').focus(); });
 
+  // ── signup ──
   function doSignup() {
     const u  = $('signup-user').value.trim().toLowerCase();
     const p  = $('signup-pass').value;
@@ -287,6 +501,7 @@
   $('signup-btn').onclick = doSignup;
   $('signup-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
 
+  // ── logout ──
   $('logout-btn').onclick = () => {
     currentUser = null;
     $('os-output').innerHTML = '';
@@ -295,12 +510,17 @@
     showScreen('login');
   };
 
+  // ── terminal ──
   function osprint(html, color) {
     const line = document.createElement('div');
     if (color) line.style.color = color;
     line.innerHTML = html;
     $('os-output').appendChild(line);
     $('os-output').scrollTop = $('os-output').scrollHeight;
+  }
+
+  function typeLines(lines, color, delay) {
+    lines.forEach((l, i) => setTimeout(() => osprint(l, color), i * delay));
   }
 
   function getAusTime() {
@@ -315,12 +535,16 @@
     $('os-username-badge').textContent = username;
     showScreen('os');
     const info = getUsers()[username];
-    osprint('🔥 Shaans Aura Super OS 🔥');
-    osprint('Welcome back, <span style="color:var(--accent)">' + username + '</span>! Joined: ' + (info?.joined || ''));
-    osprint('Type <span style="color:var(--accent)">help</span> to see all commands.');
-    setTimeout(() => $('os-input').focus(), 100);
+    const lines = [
+      '🔥 Shaans Aura Super OS 🔥',
+      'Welcome back, <span style="color:var(--accent)">' + username + '</span>! Joined: ' + (info?.joined || ''),
+      'Type <span style="color:var(--accent)">help</span> to see all commands.',
+    ];
+    typeLines(lines, null, 180);
+    setTimeout(() => $('os-input').focus(), 600);
   }
 
+  // ── commands ──
   function runCommand(raw) {
     const cmd = raw.trim().toLowerCase();
     if (!cmd) return;
@@ -352,31 +576,35 @@
 
     switch(true) {
       case cmd === 'help':
-        osprint('┌──────────────────────────────────────────┐', '#444');
-        osprint('│  Available commands                      │', '#444');
-        osprint('├──────────────────────────────────────────┤', '#444');
-        osprint('│  hello           Friendly greeting       │', '#888');
-        osprint('│  about           About this OS           │', '#888');
-        osprint('│  time            Current time (AUS)      │', '#888');
-        osprint('│  date            Current date (AUS)      │', '#888');
-        osprint('│  weather         Sydney weather          │', '#888');
-        osprint('│  calc [sum]      Calculator              │', '#888');
-        osprint('│  theme [name]    Change colour theme     │', '#888');
-        osprint('│  whoami          Your account info       │', '#888');
-        osprint('│  users           List all users          │', '#888');
-        osprint('│  joke            Random dev joke         │', '#888');
-        osprint('│  open yt         Open YouTube            │', '#888');
-        osprint('│  open google     Open Google             │', '#888');
-        osprint('│  clear           Clear the screen        │', '#888');
-        osprint('└──────────────────────────────────────────┘', '#444');
+        typeLines([
+          '┌──────────────────────────────────────────┐',
+          '│  Available commands                      │',
+          '├──────────────────────────────────────────┤',
+          '│  hello           Friendly greeting       │',
+          '│  about           About this OS           │',
+          '│  time            Current time (AUS)      │',
+          '│  date            Current date (AUS)      │',
+          '│  weather         Sydney weather          │',
+          '│  calc [sum]      Calculator              │',
+          '│  theme [name]    Change colour theme     │',
+          '│  whoami          Your account info       │',
+          '│  users           List all users          │',
+          '│  joke            Random dev joke         │',
+          '│  open yt         Open YouTube            │',
+          '│  open google     Open Google             │',
+          '│  clear           Clear the screen        │',
+          '└──────────────────────────────────────────┘',
+        ], '#555', 40);
         break;
       case cmd === 'hello':
         osprint('Hey ' + currentUser + '! 😎 Ready to build something cool?');
         break;
       case cmd === 'about':
-        osprint('Shaans Aura Super OS 🔥');
-        osprint('A custom web terminal with multi-user login.');
-        osprint('Built from scratch — HTML, CSS & JavaScript.', '#666');
+        typeLines([
+          'Shaans Aura Super OS 🔥',
+          'A custom web terminal with multi-user login.',
+          'Built from scratch — HTML, CSS & JavaScript.',
+        ], null, 150);
         break;
       case cmd === 'time':
         osprint('Current time in Australia: ' + getAusTime() + ' AEST');
@@ -390,16 +618,17 @@
           .then(r => { if (!r.ok) throw new Error(); return r.json(); })
           .then(data => {
             const cur = data.current_condition[0];
-            osprint('📍 Sydney, Australia');
-            osprint('🌡️  Temperature: ' + cur.temp_C + '°C (feels like ' + cur.FeelsLikeC + '°C)');
-            osprint('☁️  Conditions: ' + cur.weatherDesc[0].value);
-            osprint('💧 Humidity: ' + cur.humidity + '%');
-            osprint('💨 Wind: ' + cur.windspeedKmph + ' km/h');
+            typeLines([
+              '📍 Sydney, Australia',
+              '🌡️  Temperature: ' + cur.temp_C + '°C (feels like ' + cur.FeelsLikeC + '°C)',
+              '☁️  Conditions: ' + cur.weatherDesc[0].value,
+              '💧 Humidity: ' + cur.humidity + '%',
+              '💨 Wind: ' + cur.windspeedKmph + ' km/h',
+            ], null, 120);
           })
           .catch(() => {
-            osprint('📍 Sydney, Australia', '');
-            osprint('🌡️  Probably warm and sunny — this is Sydney after all! ☀️', '#ffd93d');
-            osprint('(Live weather blocked by browser. Try opening the site in a new tab.)', '#555');
+            osprint('📍 Sydney — probably sunny as always! ☀️', '#ffd93d');
+            osprint('(Live weather unavailable right now.)', '#555');
           });
         break;
       case cmd === 'whoami':
@@ -410,7 +639,7 @@
       case cmd === 'users':
         const list = Object.keys(getUsers());
         osprint('Registered users (' + list.length + '):');
-        list.forEach(u => osprint('  — ' + u, '#aaa'));
+        list.forEach((u, i) => setTimeout(() => osprint('  — ' + u, '#aaa'), i * 80));
         break;
       case cmd === 'joke':
         const jokes = [
@@ -435,9 +664,11 @@
         $('os-output').innerHTML = '';
         break;
       case cmd === 'shaan':
-        osprint('👑 Welcome, the creator of this OS!', '#ffd93d');
-        osprint('You built something amazing from scratch.', '#ffd93d');
-        osprint('The secret word is: AURA 🔥', '#ffd93d');
+        typeLines([
+          '👑 Welcome, the creator of this OS!',
+          'You built something amazing from scratch.',
+          'The secret word is: AURA 🔥',
+        ], '#ffd93d', 300);
         break;
       default:
         osprint('Unknown command: "' + raw + '". Type help to see all commands.', '#f87171');
