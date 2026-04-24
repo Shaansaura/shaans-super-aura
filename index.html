@@ -6,7 +6,6 @@
   <title>Shaans Aura Super OS</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       background: var(--bg, #0a0a0a);
       min-height: 100vh;
@@ -15,266 +14,115 @@
       overflow-y: auto;
       transition: background 0.4s;
     }
-
-    /* ── matrix canvas ── */
     #matrix {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
-      z-index: 0;
-      opacity: 0.13;
+      z-index: 0; opacity: 0.13;
       pointer-events: none;
     }
-
     .screen { display: none; width: 100%; position: relative; z-index: 1; }
     .screen.active {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 2rem 1rem;
-      min-height: 100vh;
+      display: flex; justify-content: center;
+      align-items: flex-start; padding: 2rem 1rem; min-height: 100vh;
     }
-
-    /* ── boot screen ── */
     #screen-boot {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      position: fixed;
-      top: 0; left: 0; width: 100%;
-      z-index: 100;
-      background: #0a0a0a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100vh; position: fixed;
+      top: 0; left: 0; width: 100%; z-index: 100; background: #0a0a0a;
     }
-    #boot-text {
-      font-size: 15px;
-      color: #22c55e;
-      white-space: pre;
-      line-height: 1.6;
-      text-align: center;
-    }
+    #boot-text { font-size: 15px; color: #22c55e; white-space: pre; line-height: 1.6; text-align: center; }
     .glitch {
-      font-size: 28px;
-      font-weight: bold;
-      color: #22c55e;
-      margin-bottom: 24px;
-      position: relative;
-      animation: glitch 1.5s infinite;
+      font-size: 28px; font-weight: bold; color: #22c55e;
+      margin-bottom: 24px; position: relative; animation: glitch 1.5s infinite;
     }
     .glitch::before, .glitch::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 0; top: 0;
-      width: 100%;
+      content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%;
     }
-    .glitch::before {
-      color: #ff00ff;
-      animation: glitch-top 1.5s infinite;
-      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
-    }
-    .glitch::after {
-      color: #00ffff;
-      animation: glitch-bot 1.5s infinite;
-      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
-    }
-    @keyframes glitch {
-      0%,94%,100% { transform: none; }
-      95% { transform: skewX(-3deg); }
-      97% { transform: skewX(3deg); }
-    }
-    @keyframes glitch-top {
-      0%,94%,100% { transform: none; opacity: 0; }
-      95% { transform: translate(-3px, -2px); opacity: 0.8; }
-      97% { transform: translate(3px, 2px); opacity: 0.8; }
-    }
-    @keyframes glitch-bot {
-      0%,94%,100% { transform: none; opacity: 0; }
-      95% { transform: translate(3px, 2px); opacity: 0.8; }
-      97% { transform: translate(-3px, -2px); opacity: 0.8; }
-    }
-    #boot-bar-wrap {
-      width: 260px;
-      height: 4px;
-      background: #1a1a1a;
-      border-radius: 4px;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-    #boot-bar {
-      height: 100%;
-      width: 0%;
-      background: #22c55e;
-      border-radius: 4px;
-      transition: width 0.1s linear;
-      box-shadow: 0 0 8px #22c55e;
-    }
-
-    /* ── card ── */
+    .glitch::before { color: #ff00ff; animation: glitch-top 1.5s infinite; clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%); }
+    .glitch::after  { color: #00ffff; animation: glitch-bot 1.5s infinite; clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%); }
+    @keyframes glitch     { 0%,94%,100%{transform:none} 95%{transform:skewX(-3deg)} 97%{transform:skewX(3deg)} }
+    @keyframes glitch-top { 0%,94%,100%{transform:none;opacity:0} 95%{transform:translate(-3px,-2px);opacity:.8} 97%{transform:translate(3px,2px);opacity:.8} }
+    @keyframes glitch-bot { 0%,94%,100%{transform:none;opacity:0} 95%{transform:translate(3px,2px);opacity:.8} 97%{transform:translate(-3px,-2px);opacity:.8} }
+    #boot-bar-wrap { width:260px; height:4px; background:#1a1a1a; border-radius:4px; margin-top:20px; overflow:hidden; }
+    #boot-bar { height:100%; width:0%; background:#22c55e; border-radius:4px; transition:width .1s linear; box-shadow:0 0 8px #22c55e; }
     .card {
-      background: rgba(15,15,15,0.92);
-      border: 1px solid #2a2a2a;
-      border-radius: 12px;
-      overflow: hidden;
-      width: 360px;
-      margin-top: auto;
-      margin-bottom: auto;
-      animation: fadeUp 0.5s ease both;
-      backdrop-filter: blur(6px);
+      background: rgba(15,15,15,0.92); border: 1px solid #2a2a2a;
+      border-radius: 12px; overflow: hidden; width: 360px;
+      margin-top: auto; margin-bottom: auto;
+      animation: fadeUp 0.5s ease both; backdrop-filter: blur(6px);
     }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .titlebar {
-      background: #1a1a1a;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      border-bottom: 1px solid #2a2a2a;
-    }
-    .titlebar-title { margin-left: 8px; font-size: 12px; color: #555; }
-    .dot { width: 12px; height: 12px; border-radius: 50%; }
-    .card-body { padding: 24px; }
-    .brand { font-size: 20px; font-weight: bold; color: var(--accent, #22c55e); margin-bottom: 4px; }
-    .brand-sub { font-size: 12px; color: #444; margin-bottom: 24px; }
-    label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
-    .field { margin-bottom: 14px; }
-
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .titlebar { background:#1a1a1a; padding:10px 16px; display:flex; align-items:center; gap:7px; border-bottom:1px solid #2a2a2a; }
+    .titlebar-title { margin-left:8px; font-size:12px; color:#555; }
+    .dot { width:12px; height:12px; border-radius:50%; }
+    .card-body { padding:24px; }
+    .brand { font-size:20px; font-weight:bold; color:var(--accent,#22c55e); margin-bottom:4px; }
+    .brand-sub { font-size:12px; color:#444; margin-bottom:24px; }
+    label { display:block; font-size:12px; color:#666; margin-bottom:5px; }
+    .field { margin-bottom:14px; }
     input[type="text"], input[type="password"] {
-      width: 100%;
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 8px;
-      color: #e0e0e0;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      padding: 9px 12px;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      width:100%; background:#1a1a1a; border:1px solid #2a2a2a; border-radius:8px;
+      color:#e0e0e0; font-family:'Courier New',monospace; font-size:13px;
+      padding:9px 12px; outline:none; transition:border-color .15s,box-shadow .15s;
     }
-    input:focus {
-      border-color: var(--accent, #22c55e);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #22c55e) 20%, transparent);
-    }
-    input::placeholder { color: #444; }
-
+    input:focus { border-color:var(--accent,#22c55e); box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#22c55e) 20%,transparent); }
+    input::placeholder { color:#444; }
     .btn {
-      width: 100%;
-      background: var(--accent, #22c55e);
-      color: #0a0a0a;
-      border: none;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 13px;
-      font-weight: bold;
-      font-family: 'Courier New', monospace;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
+      width:100%; background:var(--accent,#22c55e); color:#0a0a0a; border:none;
+      border-radius:8px; padding:10px; font-size:13px; font-weight:bold;
+      font-family:'Courier New',monospace; cursor:pointer; transition:opacity .15s,transform .1s;
     }
-    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-
-    .msg { font-size: 12px; min-height: 18px; margin-bottom: 10px; }
-    .msg.err { color: #f87171; }
-    .msg.ok  { color: var(--accent, #22c55e); }
-    .switch-link { text-align: center; margin-top: 14px; font-size: 12px; color: #444; }
-    .switch-link span { color: var(--accent, #22c55e); cursor: pointer; text-decoration: underline; }
-
-    /* ── OS terminal ── */
-    #screen-os .card { width: min(680px, 100%); }
+    .btn:hover { opacity:.85; transform:translateY(-1px); }
+    .btn:active { transform:translateY(0); }
+    .msg { font-size:12px; min-height:18px; margin-bottom:10px; }
+    .msg.err { color:#f87171; }
+    .msg.ok  { color:var(--accent,#22c55e); }
+    .switch-link { text-align:center; margin-top:14px; font-size:12px; color:#444; }
+    .switch-link span { color:var(--accent,#22c55e); cursor:pointer; text-decoration:underline; }
+    #screen-os .card { width:min(680px,100%); }
     .os-titlebar {
-      background: #1a1a1a;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #2a2a2a;
+      background:#1a1a1a; padding:10px 16px; display:flex;
+      align-items:center; justify-content:space-between; border-bottom:1px solid #2a2a2a;
     }
-    .os-titlebar-left { display: flex; align-items: center; gap: 7px; }
-    #os-username-badge { font-size: 12px; color: var(--accent, #22c55e); }
+    .os-titlebar-left { display:flex; align-items:center; gap:7px; }
+    #os-username-badge { font-size:12px; color:var(--accent,#22c55e); }
     .btn-ghost {
-      background: transparent;
-      color: var(--accent, #22c55e);
-      border: 1px solid var(--accent, #22c55e);
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-family: 'Courier New', monospace;
-      cursor: pointer;
-      transition: opacity 0.15s;
+      background:transparent; color:var(--accent,#22c55e); border:1px solid var(--accent,#22c55e);
+      border-radius:6px; padding:4px 10px; font-size:11px;
+      font-family:'Courier New',monospace; cursor:pointer; transition:opacity .15s;
     }
-    .btn-ghost:hover { opacity: 0.75; }
-
+    .btn-ghost:hover { opacity:.75; }
     #os-output {
-      padding: 16px;
-      min-height: 320px;
-      max-height: 420px;
-      overflow-y: auto;
-      font-size: 13px;
-      line-height: 1.8;
-      color: var(--accent, #22c55e);
+      padding:16px; min-height:320px; max-height:420px; overflow-y:auto;
+      font-size:13px; line-height:1.8; color:var(--accent,#22c55e);
     }
-    #os-output div {
-      animation: lineIn 0.15s ease both;
-    }
-    @keyframes lineIn {
-      from { opacity: 0; transform: translateX(-6px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
-    .os-inputbar {
-      display: flex;
-      align-items: center;
-      padding: 10px 16px;
-      border-top: 1px solid #1a1a1a;
-      background: #0d0d0d;
-    }
-    .os-prompt { color: var(--accent, #22c55e); margin-right: 8px; font-size: 13px; }
+    #os-output div { animation:lineIn .15s ease both; }
+    @keyframes lineIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+    .os-inputbar { display:flex; align-items:center; padding:10px 16px; border-top:1px solid #1a1a1a; background:#0d0d0d; }
+    .os-prompt { color:var(--accent,#22c55e); margin-right:8px; font-size:13px; }
     #os-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--accent, #22c55e);
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      caret-color: var(--accent, #22c55e);
+      flex:1; background:transparent; border:none; outline:none;
+      color:var(--accent,#22c55e); font-family:'Courier New',monospace;
+      font-size:13px; caret-color:var(--accent,#22c55e);
     }
-    #os-input::placeholder { color: #333; }
-
-    /* ── scanline overlay ── */
+    #os-input::placeholder { color:#333; }
     body::after {
-      content: '';
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 3px,
-        rgba(0,0,0,0.08) 3px,
-        rgba(0,0,0,0.08) 4px
-      );
-      pointer-events: none;
-      z-index: 999;
+      content:''; position:fixed; top:0; left:0; width:100%; height:100%;
+      background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,0.08) 3px,rgba(0,0,0,0.08) 4px);
+      pointer-events:none; z-index:999;
     }
   </style>
 </head>
 <body>
-
 <canvas id="matrix"></canvas>
 
-<!-- BOOT SCREEN -->
 <div id="screen-boot">
   <div class="glitch" data-text="🔥 SHAANS AURA SUPER OS">🔥 SHAANS AURA SUPER OS</div>
   <div id="boot-text"></div>
   <div id="boot-bar-wrap"><div id="boot-bar"></div></div>
 </div>
 
-<!-- LOGIN -->
 <div id="screen-login" class="screen">
   <div class="card">
     <div class="titlebar">
@@ -286,14 +134,8 @@
     <div class="card-body">
       <div class="brand">🔥 Shaans Aura Super OS</div>
       <div class="brand-sub">Sign in to your account</div>
-      <div class="field">
-        <label>username</label>
-        <input type="text" id="login-user" placeholder="your username" autocomplete="username">
-      </div>
-      <div class="field">
-        <label>password</label>
-        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-      </div>
+      <div class="field"><label>username</label><input type="text" id="login-user" placeholder="your username" autocomplete="username"></div>
+      <div class="field"><label>password</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"></div>
       <div class="msg err" id="login-err"></div>
       <button class="btn" id="login-btn">Sign in</button>
       <div class="switch-link">No account? <span id="go-signup">Sign up</span></div>
@@ -301,7 +143,6 @@
   </div>
 </div>
 
-<!-- SIGNUP -->
 <div id="screen-signup" class="screen">
   <div class="card">
     <div class="titlebar">
@@ -313,18 +154,9 @@
     <div class="card-body">
       <div class="brand">Create account</div>
       <div class="brand-sub">Join Shaans Aura Super OS</div>
-      <div class="field">
-        <label>username</label>
-        <input type="text" id="signup-user" placeholder="choose a username">
-      </div>
-      <div class="field">
-        <label>password</label>
-        <input type="password" id="signup-pass" placeholder="at least 4 characters">
-      </div>
-      <div class="field">
-        <label>confirm password</label>
-        <input type="password" id="signup-pass2" placeholder="repeat password">
-      </div>
+      <div class="field"><label>username</label><input type="text" id="signup-user" placeholder="choose a username"></div>
+      <div class="field"><label>password</label><input type="password" id="signup-pass" placeholder="at least 4 characters"></div>
+      <div class="field"><label>confirm password</label><input type="password" id="signup-pass2" placeholder="repeat password"></div>
       <div class="msg err" id="signup-err"></div>
       <div class="msg ok" id="signup-ok"></div>
       <button class="btn" id="signup-btn">Create account</button>
@@ -333,7 +165,6 @@
   </div>
 </div>
 
-<!-- OS -->
 <div id="screen-os" class="screen">
   <div class="card">
     <div class="os-titlebar">
@@ -357,329 +188,433 @@
 </div>
 
 <script>
-  const $ = id => document.getElementById(id);
-  let currentUser = null;
-  const cmdHistory = [];
-  let histIdx = -1;
+const $ = id => document.getElementById(id);
+let currentUser = null;
+const cmdHistory = [];
+let histIdx = -1;
 
-  // ── matrix rain ──
-  const canvas = $('matrix');
-  const ctx = canvas.getContext('2d');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
-  const cols = Math.floor(canvas.width / 16);
-  const drops = Array(cols).fill(1);
-  function drawMatrix() {
-    ctx.fillStyle = 'rgba(10,10,10,0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#22c55e';
-    ctx.font = '14px Courier New';
-    drops.forEach((y, i) => {
-      const char = String.fromCharCode(0x30A0 + Math.random() * 96);
-      ctx.fillText(char, i * 16, y * 16);
-      if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
-    });
-  }
-  setInterval(drawMatrix, 50);
-
-  // ── themes ──
-  const themes = {
-    green:  { accent: '#22c55e', bg: '#0a0a0a' },
-    blue:   { accent: '#38bdf8', bg: '#04080f' },
-    pink:   { accent: '#f472b6', bg: '#0f0408' },
-    orange: { accent: '#fb923c', bg: '#0f0800' },
-    purple: { accent: '#a78bfa', bg: '#07040f' },
-  };
-  function setTheme(name) {
-    const t = themes[name];
-    if (!t) return false;
-    document.documentElement.style.setProperty('--accent', t.accent);
-    document.documentElement.style.setProperty('--bg', t.bg);
-    document.body.style.background = t.bg;
-    localStorage.setItem('shaanos_theme', name);
-    return true;
-  }
-  setTheme(localStorage.getItem('shaanos_theme') || 'green');
-
-  // ── boot sequence ──
-  const bootLines = [
-    'Initializing Shaans Aura Super OS...',
-    'Loading kernel modules... OK',
-    'Mounting file system... OK',
-    'Starting user services... OK',
-    'Applying aura... ✓',
-    'System ready.',
-  ];
-  let bootLine = 0;
-  let bootChar = 0;
-  let bootProgress = 0;
-  const bootEl = $('boot-text');
-  const bootBar = $('boot-bar');
-
-  function typeBoot() {
-    if (bootLine >= bootLines.length) {
-      setTimeout(() => {
-        $('screen-boot').style.transition = 'opacity 0.6s';
-        $('screen-boot').style.opacity = '0';
-        setTimeout(() => {
-          $('screen-boot').style.display = 'none';
-          showScreen('login');
-        }, 600);
-      }, 400);
-      return;
-    }
-    const line = bootLines[bootLine];
-    if (bootChar < line.length) {
-      bootEl.textContent += line[bootChar];
-      bootChar++;
-      setTimeout(typeBoot, 18);
-    } else {
-      bootEl.textContent += '\n';
-      bootLine++;
-      bootChar = 0;
-      bootProgress = Math.round((bootLine / bootLines.length) * 100);
-      bootBar.style.width = bootProgress + '%';
-      setTimeout(typeBoot, 120);
-    }
-  }
-  setTimeout(typeBoot, 400);
-
-  // ── storage ──
-  function getUsers() {
-    try { return JSON.parse(localStorage.getItem('shaanos_users') || '{}'); }
-    catch(e) { return {}; }
-  }
-  function saveUsers(u) { localStorage.setItem('shaanos_users', JSON.stringify(u)); }
-
-  // ── screens ──
-  function showScreen(name) {
-    ['login','signup','os'].forEach(s => {
-      $('screen-'+s).classList.toggle('active', s === name);
-    });
-  }
-
-  $('go-signup').onclick = () => { $('login-err').textContent = ''; showScreen('signup'); };
-  $('go-login').onclick  = () => { $('signup-err').textContent = ''; $('signup-ok').textContent = ''; showScreen('login'); };
-
-  // ── login ──
-  function doLogin() {
-    const u = $('login-user').value.trim().toLowerCase();
-    const p = $('login-pass').value;
-    if (!u || !p) { $('login-err').textContent = 'Please fill in both fields.'; return; }
-    const users = getUsers();
-    if (!users[u] || users[u].password !== p) { $('login-err').textContent = 'Wrong username or password.'; return; }
-    $('login-err').textContent = '';
-    $('login-pass').value = '';
-    currentUser = u;
-    bootOS(u);
-  }
-  $('login-btn').onclick = doLogin;
-  $('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  $('login-user').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-pass').focus(); });
-
-  // ── signup ──
-  function doSignup() {
-    const u  = $('signup-user').value.trim().toLowerCase();
-    const p  = $('signup-pass').value;
-    const p2 = $('signup-pass2').value;
-    $('signup-err').textContent = '';
-    $('signup-ok').textContent  = '';
-    if (!u || !p || !p2)  { $('signup-err').textContent = 'All fields are required.'; return; }
-    if (u.length < 2)     { $('signup-err').textContent = 'Username must be at least 2 characters.'; return; }
-    if (p.length < 4)     { $('signup-err').textContent = 'Password must be at least 4 characters.'; return; }
-    if (p !== p2)         { $('signup-err').textContent = 'Passwords do not match.'; return; }
-    const users = getUsers();
-    if (users[u])         { $('signup-err').textContent = 'Username already taken.'; return; }
-    users[u] = { password: p, joined: new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Sydney' }) };
-    saveUsers(users);
-    $('signup-ok').textContent = 'Account created! Signing you in...';
-    currentUser = u;
-    setTimeout(() => bootOS(u), 900);
-  }
-  $('signup-btn').onclick = doSignup;
-  $('signup-pass2').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
-
-  // ── logout ──
-  $('logout-btn').onclick = () => {
-    currentUser = null;
-    $('os-output').innerHTML = '';
-    $('login-user').value = '';
-    $('login-pass').value = '';
-    showScreen('login');
-  };
-
-  // ── terminal ──
-  function osprint(html, color) {
-    const line = document.createElement('div');
-    if (color) line.style.color = color;
-    line.innerHTML = html;
-    $('os-output').appendChild(line);
-    $('os-output').scrollTop = $('os-output').scrollHeight;
-  }
-
-  function typeLines(lines, color, delay) {
-    lines.forEach((l, i) => setTimeout(() => osprint(l, color), i * delay));
-  }
-
-  function getAusTime() {
-    return new Date().toLocaleTimeString('en-AU', { timeZone: 'Australia/Sydney', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  }
-  function getAusDate() {
-    return new Date().toLocaleDateString('en-AU', { timeZone: 'Australia/Sydney', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  }
-
-  function bootOS(username) {
-    $('os-output').innerHTML = '';
-    $('os-username-badge').textContent = username;
-    showScreen('os');
-    const info = getUsers()[username];
-    const lines = [
-      '🔥 Shaans Aura Super OS 🔥',
-      'Welcome back, <span style="color:var(--accent)">' + username + '</span>! Joined: ' + (info?.joined || ''),
-      'Type <span style="color:var(--accent)">help</span> to see all commands.',
-    ];
-    typeLines(lines, null, 180);
-    setTimeout(() => $('os-input').focus(), 600);
-  }
-
-  // ── commands ──
-  function runCommand(raw) {
-    const cmd = raw.trim().toLowerCase();
-    if (!cmd) return;
-    cmdHistory.unshift(raw);
-    histIdx = -1;
-    osprint('&gt;&gt; ' + raw, 'var(--accent)');
-
-    if (cmd.startsWith('calc ')) {
-      const expr = raw.slice(5).trim();
-      try {
-        if (!/^[0-9+\-*/.() %]+$/.test(expr)) throw new Error('bad');
-        const result = Function('"use strict"; return (' + expr + ')')();
-        osprint(expr + ' = ' + result, '#ffd93d');
-      } catch(e) {
-        osprint('Invalid. Example: calc 10 * 3 + 2', '#f87171');
-      }
-      return;
-    }
-
-    if (cmd.startsWith('theme ')) {
-      const name = cmd.slice(6).trim();
-      if (setTheme(name)) {
-        osprint('Theme changed to ' + name + '! 🎨');
-      } else {
-        osprint('Unknown theme. Try: green, blue, pink, orange, purple', '#f87171');
-      }
-      return;
-    }
-
-    switch(true) {
-      case cmd === 'help':
-        typeLines([
-          '┌──────────────────────────────────────────┐',
-          '│  Available commands                      │',
-          '├──────────────────────────────────────────┤',
-          '│  hello           Friendly greeting       │',
-          '│  about           About this OS           │',
-          '│  time            Current time (AUS)      │',
-          '│  date            Current date (AUS)      │',
-          '│  weather         Sydney weather          │',
-          '│  calc [sum]      Calculator              │',
-          '│  theme [name]    Change colour theme     │',
-          '│  whoami          Your account info       │',
-          '│  users           List all users          │',
-          '│  joke            Random dev joke         │',
-          '│  open yt         Open YouTube            │',
-          '│  open google     Open Google             │',
-          '│  clear           Clear the screen        │',
-          '└──────────────────────────────────────────┘',
-        ], '#555', 40);
-        break;
-      case cmd === 'hello':
-        osprint('Hey ' + currentUser + '! 😎 Ready to build something cool?');
-        break;
-      case cmd === 'about':
-        typeLines([
-          'Shaans Aura Super OS 🔥',
-          'A custom web terminal with multi-user login.',
-          'Built from scratch — HTML, CSS & JavaScript.',
-        ], null, 150);
-        break;
-      case cmd === 'time':
-        osprint('Current time in Australia: ' + getAusTime() + ' AEST');
-        break;
-      case cmd === 'date':
-        osprint('Today in Australia: ' + getAusDate());
-        break;
-      case cmd === 'weather':
-        osprint('Fetching Sydney weather... 🌤️', '#888');
-        fetch('https://wttr.in/Sydney?format=j1', { mode: 'cors' })
-          .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-          .then(data => {
-            const cur = data.current_condition[0];
-            typeLines([
-              '📍 Sydney, Australia',
-              '🌡️  Temperature: ' + cur.temp_C + '°C (feels like ' + cur.FeelsLikeC + '°C)',
-              '☁️  Conditions: ' + cur.weatherDesc[0].value,
-              '💧 Humidity: ' + cur.humidity + '%',
-              '💨 Wind: ' + cur.windspeedKmph + ' km/h',
-            ], null, 120);
-          })
-          .catch(() => {
-            osprint('📍 Sydney — probably sunny as always! ☀️', '#ffd93d');
-            osprint('(Live weather unavailable right now.)', '#555');
-          });
-        break;
-      case cmd === 'whoami':
-        const info = getUsers()[currentUser];
-        osprint('Username: <span style="color:var(--accent)">' + currentUser + '</span>');
-        osprint('Joined: ' + (info?.joined || 'unknown'));
-        break;
-      case cmd === 'users':
-        const list = Object.keys(getUsers());
-        osprint('Registered users (' + list.length + '):');
-        list.forEach((u, i) => setTimeout(() => osprint('  — ' + u, '#aaa'), i * 80));
-        break;
-      case cmd === 'joke':
-        const jokes = [
-          ['Why do programmers prefer dark mode? Because light attracts bugs! 🐛'],
-          ['Why did the developer go broke? He used up all his cache. 💸'],
-          ['A SQL query walks into a bar: "Can I join you?" 😄'],
-          ['Why do Java devs wear glasses? Because they dont C#. 👓'],
-          ['Knock knock!', "Who's there?", 'Java.', 'Java who?', 'Java lot of bugs to fix! 🐛']
-        ];
-        const pick = jokes[Math.floor(Math.random() * jokes.length)];
-        pick.forEach((line, i) => setTimeout(() => osprint(line, '#ffd93d'), i * 600));
-        break;
-      case cmd === 'open yt':
-        osprint('Opening YouTube... 📺');
-        window.open('https://youtube.com', '_blank');
-        break;
-      case cmd === 'open google':
-        osprint('Opening Google... 🔍');
-        window.open('https://google.com', '_blank');
-        break;
-      case cmd === 'clear':
-        $('os-output').innerHTML = '';
-        break;
-      case cmd === 'shaan':
-        typeLines([
-          '👑 Welcome, the creator of this OS!',
-          'You built something amazing from scratch.',
-          'The secret word is: AURA 🔥',
-        ], '#ffd93d', 300);
-        break;
-      default:
-        osprint('Unknown command: "' + raw + '". Type help to see all commands.', '#f87171');
-    }
-  }
-
-  $('os-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') { runCommand(this.value); this.value = ''; }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); if (histIdx < cmdHistory.length - 1) { histIdx++; this.value = cmdHistory[histIdx]; } }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); if (histIdx > 0) { histIdx--; this.value = cmdHistory[histIdx]; } else { histIdx = -1; this.value = ''; } }
+// ── matrix ──
+const canvas = $('matrix');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+const cols = Math.floor(canvas.width / 16);
+const drops = Array(cols).fill(1);
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(10,10,10,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#22c55e';
+  ctx.font = '14px Courier New';
+  drops.forEach((y,i) => {
+    ctx.fillText(String.fromCharCode(0x30A0+Math.random()*96), i*16, y*16);
+    if (y*16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
   });
+}
+setInterval(drawMatrix, 50);
+
+// ── themes ──
+const themes = {
+  green:{accent:'#22c55e',bg:'#0a0a0a'}, blue:{accent:'#38bdf8',bg:'#04080f'},
+  pink:{accent:'#f472b6',bg:'#0f0408'}, orange:{accent:'#fb923c',bg:'#0f0800'},
+  purple:{accent:'#a78bfa',bg:'#07040f'},
+};
+function setTheme(name) {
+  const t = themes[name]; if (!t) return false;
+  document.documentElement.style.setProperty('--accent', t.accent);
+  document.documentElement.style.setProperty('--bg', t.bg);
+  document.body.style.background = t.bg;
+  localStorage.setItem('shaanos_theme', name); return true;
+}
+setTheme(localStorage.getItem('shaanos_theme') || 'green');
+
+// ── boot ──
+const bootLines = ['Initializing Shaans Aura Super OS...','Loading kernel modules... OK','Mounting file system... OK','Starting user services... OK','Applying aura... ✓','System ready.'];
+let bootLine=0, bootChar=0;
+const bootEl=$('boot-text'), bootBar=$('boot-bar');
+function typeBoot() {
+  if (bootLine >= bootLines.length) {
+    setTimeout(() => {
+      $('screen-boot').style.transition='opacity 0.6s';
+      $('screen-boot').style.opacity='0';
+      setTimeout(() => { $('screen-boot').style.display='none'; showScreen('login'); }, 600);
+    }, 400); return;
+  }
+  const line = bootLines[bootLine];
+  if (bootChar < line.length) {
+    bootEl.textContent += line[bootChar++];
+    setTimeout(typeBoot, 18);
+  } else {
+    bootEl.textContent += '\n'; bootLine++; bootChar=0;
+    bootBar.style.width = Math.round((bootLine/bootLines.length)*100)+'%';
+    setTimeout(typeBoot, 120);
+  }
+}
+setTimeout(typeBoot, 400);
+
+// ── storage ──
+function getUsers() { try { return JSON.parse(localStorage.getItem('shaanos_users')||'{}'); } catch(e){return{};} }
+function saveUsers(u) { localStorage.setItem('shaanos_users', JSON.stringify(u)); }
+function getNotes() { try { return JSON.parse(localStorage.getItem('shaanos_notes_'+currentUser)||'[]'); } catch(e){return[];} }
+function saveNotes(n) { localStorage.setItem('shaanos_notes_'+currentUser, JSON.stringify(n)); }
+
+// ── screens ──
+function showScreen(name) {
+  ['login','signup','os'].forEach(s => $('screen-'+s).classList.toggle('active', s===name));
+}
+$('go-signup').onclick = () => { $('login-err').textContent=''; showScreen('signup'); };
+$('go-login').onclick  = () => { $('signup-err').textContent=''; $('signup-ok').textContent=''; showScreen('login'); };
+
+// ── login ──
+function doLogin() {
+  const u=$('login-user').value.trim().toLowerCase(), p=$('login-pass').value;
+  if (!u||!p) { $('login-err').textContent='Please fill in both fields.'; return; }
+  const users=getUsers();
+  if (!users[u]||users[u].password!==p) { $('login-err').textContent='Wrong username or password.'; return; }
+  $('login-err').textContent=''; $('login-pass').value=''; currentUser=u; bootOS(u);
+}
+$('login-btn').onclick = doLogin;
+$('login-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+$('login-user').addEventListener('keydown', e=>{ if(e.key==='Enter') $('login-pass').focus(); });
+
+// ── signup ──
+function doSignup() {
+  const u=$('signup-user').value.trim().toLowerCase(), p=$('signup-pass').value, p2=$('signup-pass2').value;
+  $('signup-err').textContent=''; $('signup-ok').textContent='';
+  if (!u||!p||!p2) { $('signup-err').textContent='All fields are required.'; return; }
+  if (u.length<2)  { $('signup-err').textContent='Username must be at least 2 characters.'; return; }
+  if (p.length<4)  { $('signup-err').textContent='Password must be at least 4 characters.'; return; }
+  if (p!==p2)      { $('signup-err').textContent='Passwords do not match.'; return; }
+  const users=getUsers();
+  if (users[u])    { $('signup-err').textContent='Username already taken.'; return; }
+  users[u]={ password:p, joined:new Date().toLocaleDateString('en-AU',{timeZone:'Australia/Sydney'}) };
+  saveUsers(users); $('signup-ok').textContent='Account created! Signing you in...';
+  currentUser=u; setTimeout(()=>bootOS(u), 900);
+}
+$('signup-btn').onclick = doSignup;
+$('signup-pass2').addEventListener('keydown', e=>{ if(e.key==='Enter') doSignup(); });
+
+$('logout-btn').onclick = () => {
+  currentUser=null; $('os-output').innerHTML='';
+  $('login-user').value=''; $('login-pass').value=''; showScreen('login');
+};
+
+// ── terminal helpers ──
+function osprint(html, color) {
+  const line=document.createElement('div');
+  if (color) line.style.color=color;
+  line.innerHTML=html;
+  $('os-output').appendChild(line);
+  $('os-output').scrollTop=$('os-output').scrollHeight;
+}
+function typeLines(lines, color, delay) {
+  lines.forEach((l,i) => setTimeout(()=>osprint(l,color), i*delay));
+}
+function getAusTime() { return new Date().toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function getAusDate() { return new Date().toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+
+function bootOS(username) {
+  $('os-output').innerHTML=''; $('os-username-badge').textContent=username; showScreen('os');
+  const info=getUsers()[username];
+  typeLines(['🔥 Shaans Aura Super OS 🔥','Welcome back, <span style="color:var(--accent)">'+username+'</span>! Joined: '+(info?.joined||''),'Type <span style="color:var(--accent)">help</span> to see all commands.'], null, 180);
+  setTimeout(()=>$('os-input').focus(), 600);
+}
+
+// ── RPG GAME ──
+let rpg = null;
+
+const rpgEnemies = [
+  { name:'Goblin',      hp:30,  maxHp:30,  atk:8,  emoji:'👺', xp:20,  gold:10 },
+  { name:'Skeleton',    hp:40,  maxHp:40,  atk:12, emoji:'💀', xp:30,  gold:15 },
+  { name:'Dark Wizard', hp:55,  maxHp:55,  atk:18, emoji:'🧙', xp:50,  gold:25 },
+  { name:'Dragon',      hp:100, maxHp:100, atk:28, emoji:'🐉', xp:100, gold:60 },
+];
+
+const rpgWeapons = [
+  { name:'Fists',       atk:5,  emoji:'👊' },
+  { name:'Dagger',      atk:12, emoji:'🗡️' },
+  { name:'Sword',       atk:22, emoji:'⚔️' },
+  { name:'Flame Staff', atk:35, emoji:'🔥' },
+];
+
+function rpgBar(current, max, len=12) {
+  const filled = Math.round((current/max)*len);
+  return '█'.repeat(filled) + '░'.repeat(len-filled);
+}
+
+function startRPG() {
+  rpg = { hp:100, maxHp:100, atk:5, weapon:'Fists', weaponEmoji:'👊', xp:0, level:1, gold:0, enemy:null, inBattle:false };
+  typeLines([
+    '⚔️  Welcome to AURA QUEST ⚔️',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    'You are a warrior in the Aura Realm.',
+    'Commands during game:',
+    '  fight    — enter battle',
+    '  attack   — attack enemy',
+    '  heal     — heal yourself (costs 10 gold)',
+    '  shop     — buy weapons',
+    '  stats    — view your stats',
+    '  quit     — quit the game',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    'Type <span style="color:var(--accent)">fight</span> to begin your adventure!',
+  ], '#ffd93d', 60);
+}
+
+function rpgStats() {
+  osprint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#444');
+  osprint('⚔️  Hero Stats', '#ffd93d');
+  osprint('❤️  HP:     ' + rpg.hp + '/' + rpg.maxHp + '  [' + rpgBar(rpg.hp,rpg.maxHp) + ']', rpg.hp < 30 ? '#f87171' : '#22c55e');
+  osprint('⚔️  Weapon: ' + rpg.weaponEmoji + ' ' + rpg.weapon + ' (ATK: ' + rpg.atk + ')', '#88cfff');
+  osprint('⭐ Level:  ' + rpg.level + '  (XP: ' + rpg.xp + ')', '#ffd93d');
+  osprint('💰 Gold:   ' + rpg.gold, '#ffd93d');
+  osprint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#444');
+}
+
+function rpgFight() {
+  if (rpg.inBattle) { osprint('You are already in battle! Type attack.', '#f87171'); return; }
+  const e = rpgEnemies[Math.floor(Math.random()*rpgEnemies.length)];
+  rpg.enemy = { ...e };
+  rpg.inBattle = true;
+  typeLines([
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    'A wild ' + e.emoji + ' ' + e.name + ' appears!',
+    e.name + ' HP: [' + rpgBar(e.hp,e.maxHp) + '] ' + e.hp + '/' + e.maxHp,
+    'Type <span style="color:var(--accent)">attack</span> to fight!',
+  ], '#f87171', 80);
+}
+
+function rpgAttack() {
+  if (!rpg.inBattle) { osprint('No enemy to fight! Type fight first.', '#f87171'); return; }
+  const e = rpg.enemy;
+
+  // player attacks
+  const dmg = rpg.atk + Math.floor(Math.random()*6);
+  e.hp = Math.max(0, e.hp - dmg);
+  osprint('⚔️  You attack ' + e.name + ' for ' + dmg + ' damage!', '#22c55e');
+  osprint(e.emoji + ' ' + e.name + ' HP: [' + rpgBar(e.hp,e.maxHp) + '] ' + e.hp + '/' + e.maxHp, '#aaa');
+
+  if (e.hp <= 0) {
+    rpg.inBattle = false;
+    rpg.xp += e.xp; rpg.gold += e.gold;
+    typeLines([
+      '💥 ' + e.name + ' is defeated!',
+      '✨ You gain ' + e.xp + ' XP and ' + e.gold + ' gold!',
+    ], '#ffd93d', 120);
+    // level up
+    if (rpg.xp >= rpg.level * 80) {
+      rpg.level++; rpg.maxHp += 20; rpg.hp = Math.min(rpg.hp+20, rpg.maxHp);
+      setTimeout(()=>typeLines(['🎉 LEVEL UP! You are now level ' + rpg.level + '!','❤️  Max HP increased!'], '#ffd93d', 150), 300);
+    }
+    setTimeout(()=>osprint('Type fight to battle again or shop to upgrade.', '#888'), 600);
+    return;
+  }
+
+  // enemy attacks back
+  setTimeout(() => {
+    const edm = e.atk + Math.floor(Math.random()*6) - 2;
+    const actualDmg = Math.max(1, edm);
+    rpg.hp = Math.max(0, rpg.hp - actualDmg);
+    osprint(e.emoji + ' ' + e.name + ' hits you for ' + actualDmg + ' damage!', '#f87171');
+    osprint('❤️  Your HP: [' + rpgBar(rpg.hp,rpg.maxHp) + '] ' + rpg.hp + '/' + rpg.maxHp, rpg.hp < 30 ? '#f87171' : '#22c55e');
+    if (rpg.hp <= 0) {
+      rpg = null;
+      typeLines(['💀 You have been defeated...','Game over. Type rpg to start again.'], '#f87171', 200);
+    } else if (rpg.hp < 30) {
+      osprint('⚠️  Low HP! Type heal to recover (costs 10 gold).', '#ffd93d');
+    }
+  }, 400);
+}
+
+function rpgHeal() {
+  if (!rpg) { osprint('Start the game first with rpg.', '#f87171'); return; }
+  if (rpg.gold < 10) { osprint('Not enough gold! You need 10 gold to heal.', '#f87171'); return; }
+  const amount = 30;
+  rpg.gold -= 10; rpg.hp = Math.min(rpg.hp+amount, rpg.maxHp);
+  osprint('💊 You heal ' + amount + ' HP! Current HP: ' + rpg.hp + '/' + rpg.maxHp, '#22c55e');
+}
+
+function rpgShop() {
+  if (!rpg) { osprint('Start the game first with rpg.', '#f87171'); return; }
+  osprint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#444');
+  osprint('🏪 Weapon Shop', '#ffd93d');
+  osprint('Current weapon: ' + rpg.weaponEmoji + ' ' + rpg.weapon, '#aaa');
+  osprint('Your gold: 💰 ' + rpg.gold, '#ffd93d');
+  osprint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#444');
+  const prices = [0, 30, 80, 150];
+  rpgWeapons.forEach((w,i) => {
+    const owned = rpg.weapon === w.name;
+    const canAfford = rpg.gold >= prices[i];
+    osprint(w.emoji + ' ' + w.name + ' (ATK:' + w.atk + ') — ' + (prices[i]===0?'Free':(prices[i]+' gold')) + (owned?' ✓ Equipped':''), owned?'#22c55e':canAfford?'#aaa':'#555');
+  });
+  osprint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', '#444');
+  osprint('Type: buy dagger / buy sword / buy staff', '#888');
+}
+
+function rpgBuy(item) {
+  if (!rpg) { osprint('Start the game first with rpg.', '#f87171'); return; }
+  const map = { dagger:1, sword:2, staff:3 };
+  const idx = map[item];
+  if (idx===undefined) { osprint('Unknown item. Try: buy dagger, buy sword, buy staff', '#f87171'); return; }
+  const w = rpgWeapons[idx];
+  const prices = [0,30,80,150];
+  if (rpg.weapon===w.name) { osprint('You already have ' + w.name + '!', '#ffd93d'); return; }
+  if (rpg.gold < prices[idx]) { osprint('Not enough gold! Need ' + prices[idx] + ' gold.', '#f87171'); return; }
+  rpg.gold -= prices[idx]; rpg.weapon=w.name; rpg.weaponEmoji=w.emoji; rpg.atk=w.atk;
+  osprint('✅ You equipped ' + w.emoji + ' ' + w.name + '! ATK is now ' + w.atk + '.', '#22c55e');
+}
+
+// ── NOTES ──
+function cmdNote(args) {
+  if (!args || args.length === 0) {
+    const notes = getNotes();
+    if (notes.length===0) { osprint('No notes yet. Use: note add Your text here', '#888'); return; }
+    osprint('📝 Your notes:', '#ffd93d');
+    notes.forEach((n,i) => osprint('  [' + (i+1) + '] ' + n.text + ' <span style="color:#444">(' + n.date + ')</span>'));
+    osprint('Delete with: note del 1', '#888');
+    return;
+  }
+  if (args[0]==='add') {
+    const text = args.slice(1).join(' ');
+    if (!text) { osprint('Usage: note add Your text here', '#f87171'); return; }
+    const notes = getNotes();
+    notes.push({ text, date: new Date().toLocaleDateString('en-AU',{timeZone:'Australia/Sydney'}) });
+    saveNotes(notes);
+    osprint('📝 Note saved!', '#22c55e');
+    return;
+  }
+  if (args[0]==='del') {
+    const idx = parseInt(args[1])-1;
+    const notes = getNotes();
+    if (isNaN(idx)||idx<0||idx>=notes.length) { osprint('Invalid note number.', '#f87171'); return; }
+    const removed = notes.splice(idx,1);
+    saveNotes(notes);
+    osprint('🗑️ Deleted: "' + removed[0].text + '"', '#f87171');
+    return;
+  }
+  osprint('Usage: note | note add [text] | note del [number]', '#888');
+}
+
+// ── commands ──
+function runCommand(raw) {
+  const cmd = raw.trim().toLowerCase();
+  if (!cmd) return;
+  cmdHistory.unshift(raw); histIdx=-1;
+  osprint('&gt;&gt; ' + raw, 'var(--accent)');
+
+  // RPG sub-commands
+  if (rpg !== null) {
+    if (cmd==='attack')            { rpgAttack(); return; }
+    if (cmd==='fight')             { rpgFight(); return; }
+    if (cmd==='heal')              { rpgHeal(); return; }
+    if (cmd==='stats')             { rpgStats(); return; }
+    if (cmd==='shop')              { rpgShop(); return; }
+    if (cmd.startsWith('buy '))    { rpgBuy(cmd.slice(4).trim()); return; }
+    if (cmd==='quit')              { rpg=null; osprint('👋 You left Aura Quest. Type rpg to play again.', '#888'); return; }
+  }
+
+  if (cmd==='rpg') { startRPG(); return; }
+
+  // note command
+  if (cmd==='note' || cmd.startsWith('note ')) {
+    const args = raw.trim().split(' ').slice(1);
+    cmdNote(args); return;
+  }
+
+  if (cmd.startsWith('calc ')) {
+    const expr = raw.slice(5).trim();
+    try {
+      if (!/^[0-9+\-*/.() %]+$/.test(expr)) throw new Error();
+      osprint(expr + ' = ' + Function('"use strict";return('+expr+')')(), '#ffd93d');
+    } catch(e) { osprint('Invalid. Example: calc 10 * 3 + 2', '#f87171'); }
+    return;
+  }
+
+  if (cmd.startsWith('theme ')) {
+    const name = cmd.slice(6).trim();
+    setTheme(name) ? osprint('Theme changed to '+name+'! 🎨') : osprint('Try: green, blue, pink, orange, purple', '#f87171');
+    return;
+  }
+
+  switch(true) {
+    case cmd==='help':
+      typeLines([
+        '┌────────────────────────────────────────────┐',
+        '│  Available commands                        │',
+        '├────────────────────────────────────────────┤',
+        '│  hello           Friendly greeting         │',
+        '│  about           About this OS             │',
+        '│  time            Current time (AUS)        │',
+        '│  date            Current date (AUS)        │',
+        '│  weather         Sydney weather            │',
+        '│  calc [sum]      Calculator                │',
+        '│  theme [name]    Change colour theme       │',
+        '│  rpg             Play Aura Quest! ⚔️        │',
+        '│  note            View your notes           │',
+        '│  note add [txt]  Save a note               │',
+        '│  note del [num]  Delete a note             │',
+        '│  whoami          Your account info         │',
+        '│  users           List all users            │',
+        '│  joke            Random dev joke           │',
+        '│  open yt         Open YouTube              │',
+        '│  open google     Open Google               │',
+        '│  clear           Clear the screen          │',
+        '└────────────────────────────────────────────┘',
+      ], '#555', 35);
+      break;
+    case cmd==='hello':
+      osprint('Hey '+currentUser+'! 😎 Ready to build something cool?'); break;
+    case cmd==='about':
+      typeLines(['Shaans Aura Super OS 🔥','A custom web terminal with multi-user login.','Built from scratch — HTML, CSS & JavaScript.'], null, 150); break;
+    case cmd==='time':
+      osprint('Current time in Australia: '+getAusTime()+' AEST'); break;
+    case cmd==='date':
+      osprint('Today in Australia: '+getAusDate()); break;
+    case cmd==='weather':
+      osprint('Fetching Sydney weather... 🌤️','#888');
+      fetch('https://wttr.in/Sydney?format=j1',{mode:'cors'})
+        .then(r=>{if(!r.ok)throw new Error();return r.json();})
+        .then(data=>{
+          const cur=data.current_condition[0];
+          typeLines(['📍 Sydney, Australia','🌡️  Temperature: '+cur.temp_C+'°C (feels like '+cur.FeelsLikeC+'°C)','☁️  Conditions: '+cur.weatherDesc[0].value,'💧 Humidity: '+cur.humidity+'%','💨 Wind: '+cur.windspeedKmph+' km/h'], null, 120);
+        })
+        .catch(()=>{ osprint('📍 Sydney — probably sunny as always! ☀️','#ffd93d'); osprint('(Live weather unavailable.)','#555'); });
+      break;
+    case cmd==='whoami':
+      const info=getUsers()[currentUser];
+      osprint('Username: <span style="color:var(--accent)">'+currentUser+'</span>');
+      osprint('Joined: '+(info?.joined||'unknown')); break;
+    case cmd==='users':
+      const list=Object.keys(getUsers());
+      osprint('Registered users ('+list.length+'):');
+      list.forEach((u,i)=>setTimeout(()=>osprint('  — '+u,'#aaa'),i*80)); break;
+    case cmd==='joke':
+      const jokes=[
+        ['Why do programmers prefer dark mode? Because light attracts bugs! 🐛'],
+        ['Why did the developer go broke? He used up all his cache. 💸'],
+        ['A SQL query walks into a bar: "Can I join you?" 😄'],
+        ['Why do Java devs wear glasses? Because they dont C#. 👓'],
+        ['Knock knock!',"Who's there?",'Java.','Java who?','Java lot of bugs to fix! 🐛']
+      ];
+      const pick=jokes[Math.floor(Math.random()*jokes.length)];
+      pick.forEach((line,i)=>setTimeout(()=>osprint(line,'#ffd93d'),i*600)); break;
+    case cmd==='open yt':
+      osprint('Opening YouTube... 📺'); window.open('https://youtube.com','_blank'); break;
+    case cmd==='open google':
+      osprint('Opening Google... 🔍'); window.open('https://google.com','_blank'); break;
+    case cmd==='clear':
+      $('os-output').innerHTML=''; break;
+    case cmd==='shaan':
+      typeLines(['👑 Welcome, the creator of this OS!','You built something amazing from scratch.','The secret word is: AURA 🔥'],'#ffd93d',300); break;
+    default:
+      osprint('Unknown command: "'+raw+'". Type help to see all commands.','#f87171');
+  }
+}
+
+$('os-input').addEventListener('keydown', function(e) {
+  if (e.key==='Enter') { runCommand(this.value); this.value=''; }
+  else if (e.key==='ArrowUp') { e.preventDefault(); if(histIdx<cmdHistory.length-1){histIdx++;this.value=cmdHistory[histIdx];} }
+  else if (e.key==='ArrowDown') { e.preventDefault(); if(histIdx>0){histIdx--;this.value=cmdHistory[histIdx];}else{histIdx=-1;this.value='';} }
+});
 </script>
 </body>
 </html>
