@@ -510,6 +510,8 @@ function runCommand(raw) {
     if (cmd==='shop')              { rpgShop(); return; }
     if (cmd.startsWith('buy '))    { rpgBuy(cmd.slice(4).trim()); return; }
     if (cmd==='quit')              { rpg=null; osprint('👋 You left Aura Quest. Type rpg to play again.', '#888'); return; }
+    if (cmd==='ultrablast') { if(!rpg.inBattle){osprint('No enemy to blast!','#f87171');return;} const instakill=rpg.enemy.hp; rpg.enemy.hp=0; osprint('💥 ULTRA BLAST!! You deal '+instakill+' damage — ONE HIT KO!!','#ffd93d'); setTimeout(()=>rpgAttack._killed=true,100); rpg.inBattle=false; rpg.xp+=rpg.enemy.xp*2; rpg.gold+=rpg.enemy.gold*2; osprint('✨ DOUBLE rewards! '+rpg.enemy.xp*2+' XP and '+rpg.enemy.gold*2+' gold!','#ffd93d'); rpg.enemy=null; return; }
+if (cmd==='megaheal') { if(!rpg){osprint('Start the game first!','#f87171');return;} rpg.hp=rpg.maxHp; osprint('💚 MEGA HEAL!! HP fully restored to '+rpg.maxHp+'/'+rpg.maxHp+'!','#22c55e'); osprint('✨ You glow with the power of the Aura Realm...','#ffd93d'); return; }
   }
 
   if (cmd==='rpg') { startRPG(); return; }
